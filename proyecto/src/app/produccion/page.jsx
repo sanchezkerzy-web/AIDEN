@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useMemo, useState } from "react";
@@ -13,8 +12,6 @@ import {
   Pencil,
   Trash2,
   X,
-  CalendarDays,
-  Users,
   ChevronRight,
   ChevronLeft,
   CheckCircle2,
@@ -169,8 +166,11 @@ export default function ProduccionPage() {
       return;
     }
 
-    if (Number(formulario.cantidad) <= 0) {
-      setError("La cantidad debe ser mayor que cero.");
+    if (
+      !Number.isInteger(Number(formulario.cantidad)) ||
+      Number(formulario.cantidad) <= 0
+    ) {
+      setError("La cantidad debe ser un número entero mayor que cero.");
       return;
     }
 
@@ -260,13 +260,12 @@ export default function ProduccionPage() {
   }
 
   return (
-    <div className="min-h-full space-y-6 bg-[#EFF4F0] p-1 sm:p-2">
-
+    <main className="min-h-full space-y-6 bg-[#EFF4F0] p-1 sm:p-2">
       {/* ENCABEZADO */}
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+      <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <div className="mb-2 flex items-center gap-2 text-sm font-medium text-[#16A34A]">
-            <Sprout size={18} />
+            <Sprout size={18} aria-hidden="true" />
             Gestión agrícola
           </div>
 
@@ -280,16 +279,20 @@ export default function ProduccionPage() {
         </div>
 
         <button
+          type="button"
           onClick={abrirNuevoLote}
           className="flex items-center justify-center gap-2 rounded-xl bg-[#009F6B] px-5 py-3 font-semibold text-white shadow-sm transition hover:bg-[#00885B]"
         >
-          <Plus size={19} />
+          <Plus size={19} aria-hidden="true" />
           Nuevo lote
         </button>
-      </div>
+      </header>
 
       {/* INDICADORES */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section
+        aria-label="Resumen de producción"
+        className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4"
+      >
         <TarjetaIndicador
           titulo="Total de lotes"
           valor={lotes.length}
@@ -321,7 +324,7 @@ export default function ProduccionPage() {
           icono={<Leaf size={23} />}
           color="text-emerald-600"
         />
-      </div>
+      </section>
 
       {/* SEGUIMIENTO DE ETAPAS */}
       <section className="rounded-2xl border border-[#DCE8DF] bg-white p-5 shadow-sm">
@@ -337,7 +340,9 @@ export default function ProduccionPage() {
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
           {conteoEtapas.map((etapa, index) => (
             <button
+              type="button"
               key={etapa.nombre}
+              aria-pressed={filtroEtapa === etapa.nombre}
               onClick={() =>
                 setFiltroEtapa(
                   filtroEtapa === etapa.nombre ? "Todas" : etapa.nombre
@@ -388,10 +393,13 @@ export default function ProduccionPage() {
             <div className="relative">
               <Search
                 size={18}
+                aria-hidden="true"
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
               />
+
               <input
-                type="text"
+                type="search"
+                aria-label="Buscar lote por código, especie, variedad o responsable"
                 value={busqueda}
                 onChange={(e) => setBusqueda(e.target.value)}
                 placeholder="Buscar lote o especie..."
@@ -400,6 +408,7 @@ export default function ProduccionPage() {
             </div>
 
             <select
+              aria-label="Filtrar lotes por etapa"
               value={filtroEtapa}
               onChange={(e) => setFiltroEtapa(e.target.value)}
               className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-[#16A34A]"
@@ -417,15 +426,34 @@ export default function ProduccionPage() {
         {/* TABLA */}
         <div className="overflow-x-auto">
           <table className="w-full min-w-[850px] border-collapse text-left">
+            <caption className="sr-only">
+              Lotes registrados y sus datos de producción
+            </caption>
+
             <thead>
               <tr className="bg-[#F1F6F2] text-xs font-semibold uppercase text-slate-600">
-                <th className="rounded-l-lg px-4 py-4">Código</th>
-                <th className="px-4 py-4">Especie</th>
-                <th className="px-4 py-4">Fecha de siembra</th>
-                <th className="px-4 py-4">Cantidad</th>
-                <th className="px-4 py-4">Etapa</th>
-                <th className="px-4 py-4">Responsable</th>
-                <th className="rounded-r-lg px-4 py-4 text-center">
+                <th scope="col" className="rounded-l-lg px-4 py-4">
+                  Código
+                </th>
+                <th scope="col" className="px-4 py-4">
+                  Especie
+                </th>
+                <th scope="col" className="px-4 py-4">
+                  Fecha de siembra
+                </th>
+                <th scope="col" className="px-4 py-4">
+                  Cantidad
+                </th>
+                <th scope="col" className="px-4 py-4">
+                  Etapa
+                </th>
+                <th scope="col" className="px-4 py-4">
+                  Responsable
+                </th>
+                <th
+                  scope="col"
+                  className="rounded-r-lg px-4 py-4 text-center"
+                >
                   Acciones
                 </th>
               </tr>
@@ -475,27 +503,33 @@ export default function ProduccionPage() {
                   <td className="px-4 py-5">
                     <div className="flex items-center justify-center gap-3">
                       <button
+                        type="button"
+                        aria-label={`Ver detalles del lote ${lote.codigo}`}
                         title="Ver detalles"
                         onClick={() => setLoteDetalle(lote)}
                         className="text-blue-500 transition hover:text-blue-700"
                       >
-                        <Eye size={19} />
+                        <Eye size={19} aria-hidden="true" />
                       </button>
 
                       <button
+                        type="button"
+                        aria-label={`Editar lote ${lote.codigo}`}
                         title="Editar lote"
                         onClick={() => abrirEdicion(lote)}
                         className="text-[#16A34A] transition hover:text-green-700"
                       >
-                        <Pencil size={19} />
+                        <Pencil size={19} aria-hidden="true" />
                       </button>
 
                       <button
+                        type="button"
+                        aria-label={`Eliminar lote ${lote.codigo}`}
                         title="Eliminar lote"
                         onClick={() => eliminarLote(lote.id)}
                         className="text-red-500 transition hover:text-red-700"
                       >
-                        <Trash2 size={19} />
+                        <Trash2 size={19} aria-hidden="true" />
                       </button>
                     </div>
                   </td>
@@ -505,9 +539,10 @@ export default function ProduccionPage() {
           </table>
 
           {lotesFiltrados.length === 0 && (
-            <div className="py-12 text-center">
+            <div role="status" className="py-12 text-center">
               <ClipboardList
                 size={35}
+                aria-hidden="true"
                 className="mx-auto mb-3 text-slate-300"
               />
               <p className="font-semibold text-slate-600">
@@ -527,23 +562,36 @@ export default function ProduccionPage() {
 
       {/* MODAL NUEVO / EDITAR */}
       {modalAbierto && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 p-4">
-          <div className="my-auto w-full max-w-xl rounded-2xl bg-white p-6 shadow-xl">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="titulo-modal-lote"
+          className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 p-4"
+        >
+          <article className="my-auto w-full max-w-xl rounded-2xl bg-white p-6 shadow-xl">
             <div className="mb-6 flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-bold text-[#0B2115]">
-                  {loteEditando ? "Editar lote" : "Registrar nuevo lote"}
+                <h2
+                  id="titulo-modal-lote"
+                  className="text-xl font-bold text-[#0B2115]"
+                >
+                  {loteEditando
+                    ? "Editar lote"
+                    : "Registrar nuevo lote"}
                 </h2>
+
                 <p className="mt-1 text-sm text-slate-500">
                   Ingresa la información del cultivo.
                 </p>
               </div>
 
               <button
+                type="button"
+                aria-label="Cerrar formulario de lote"
                 onClick={() => setModalAbierto(false)}
                 className="rounded-lg p-2 text-slate-400 hover:bg-slate-100"
               >
-                <X size={22} />
+                <X size={22} aria-hidden="true" />
               </button>
             </div>
 
@@ -579,10 +627,15 @@ export default function ProduccionPage() {
                 />
 
                 <div>
-                  <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                  <label
+                    htmlFor="etapa-cultivo"
+                    className="mb-1.5 block text-sm font-medium text-slate-700"
+                  >
                     Etapa del cultivo
                   </label>
+
                   <select
+                    id="etapa-cultivo"
                     value={formulario.etapa}
                     onChange={(e) =>
                       actualizarCampo("etapa", e.target.value)
@@ -606,12 +659,15 @@ export default function ProduccionPage() {
               </div>
 
               {error && (
-                <p className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
+                <p
+                  role="alert"
+                  className="rounded-lg bg-red-50 p-3 text-sm text-red-600"
+                >
                   {error}
                 </p>
               )}
 
-              <div className="flex flex-col-reverse justify-end gap-3 pt-3 sm:flex-row">
+              <footer className="flex flex-col-reverse justify-end gap-3 pt-3 sm:flex-row">
                 <button
                   type="button"
                   onClick={() => setModalAbierto(false)}
@@ -624,48 +680,75 @@ export default function ProduccionPage() {
                   type="submit"
                   className="rounded-xl bg-[#009F6B] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#00885B]"
                 >
-                  {loteEditando ? "Guardar cambios" : "Registrar lote"}
+                  {loteEditando
+                    ? "Guardar cambios"
+                    : "Registrar lote"}
                 </button>
-              </div>
+              </footer>
             </form>
-          </div>
+          </article>
         </div>
       )}
 
       {/* MODAL DETALLES */}
       {loteDetalle && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 p-4">
-          <div className="my-auto w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="titulo-detalle-lote"
+          className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 p-4"
+        >
+          <article className="my-auto w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
             <div className="mb-5 flex items-center justify-between">
-              <h2 className="text-xl font-bold text-[#0B2115]">
+              <h2
+                id="titulo-detalle-lote"
+                className="text-xl font-bold text-[#0B2115]"
+              >
                 Detalles del lote
               </h2>
+
               <button
+                type="button"
+                aria-label="Cerrar detalles del lote"
                 onClick={() => setLoteDetalle(null)}
                 className="rounded-lg p-2 text-slate-400 hover:bg-slate-100"
               >
-                <X size={22} />
+                <X size={22} aria-hidden="true" />
               </button>
             </div>
 
             <div className="space-y-4">
               <div className="rounded-xl bg-[#F1F6F2] p-4">
-                <p className="text-xs text-slate-500">Código del lote</p>
+                <p className="text-xs text-slate-500">
+                  Código del lote
+                </p>
                 <p className="mt-1 text-lg font-bold text-[#16A34A]">
                   {loteDetalle.codigo}
                 </p>
               </div>
 
-              <DetalleDato etiqueta="Especie" valor={loteDetalle.especie} />
-              <DetalleDato etiqueta="Variedad" valor={loteDetalle.variedad} />
+              <DetalleDato
+                etiqueta="Especie"
+                valor={loteDetalle.especie}
+              />
+
+              <DetalleDato
+                etiqueta="Variedad"
+                valor={loteDetalle.variedad}
+              />
+
               <DetalleDato
                 etiqueta="Fecha de siembra"
                 valor={loteDetalle.fechaSiembra}
               />
+
               <DetalleDato
                 etiqueta="Cantidad"
-                valor={`${Number(loteDetalle.cantidad).toLocaleString("es-CO")} plantas`}
+                valor={`${Number(
+                  loteDetalle.cantidad
+                ).toLocaleString("es-CO")} plantas`}
               />
+
               <DetalleDato
                 etiqueta="Responsable"
                 valor={loteDetalle.responsable}
@@ -692,15 +775,17 @@ export default function ProduccionPage() {
 
                 <div className="flex items-center justify-between gap-3">
                   <button
+                    type="button"
                     onClick={() => cambiarEtapa(loteDetalle, -1)}
                     disabled={etapas.indexOf(loteDetalle.etapa) === 0}
                     className="flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-30"
                   >
-                    <ChevronLeft size={17} />
+                    <ChevronLeft size={17} aria-hidden="true" />
                     Anterior
                   </button>
 
                   <button
+                    type="button"
                     onClick={() => cambiarEtapa(loteDetalle, 1)}
                     disabled={
                       etapas.indexOf(loteDetalle.etapa) ===
@@ -709,28 +794,34 @@ export default function ProduccionPage() {
                     className="flex items-center gap-1 rounded-lg bg-[#009F6B] px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-30"
                   >
                     Siguiente
-                    <ChevronRight size={17} />
+                    <ChevronRight size={17} aria-hidden="true" />
                   </button>
                 </div>
               </div>
 
               <div className="flex items-center gap-2 rounded-lg bg-green-50 p-3 text-sm text-green-700">
-                <CheckCircle2 size={18} />
+                <CheckCircle2 size={18} aria-hidden="true" />
                 Los cambios de etapa se reflejan en el resumen de producción.
               </div>
             </div>
-          </div>
+          </article>
         </div>
       )}
-    </div>
+    </main>
   );
 }
 
 /* COMPONENTES AUXILIARES */
 
-function TarjetaIndicador({ titulo, valor, descripcion, icono, color }) {
+function TarjetaIndicador({
+  titulo,
+  valor,
+  descripcion,
+  icono,
+  color,
+}) {
   return (
-    <div className="rounded-2xl border border-[#DCE8DF] bg-white p-5 shadow-sm">
+    <article className="rounded-2xl border border-[#DCE8DF] bg-white p-5 shadow-sm">
       <div className="flex items-center justify-between">
         <p className="text-sm text-slate-500">{titulo}</p>
         <span className={color}>{icono}</span>
@@ -743,7 +834,7 @@ function TarjetaIndicador({ titulo, valor, descripcion, icono, color }) {
       <p className="mt-1 text-xs text-slate-400">
         {descripcion}
       </p>
-    </div>
+    </article>
   );
 }
 
@@ -754,17 +845,29 @@ function CampoFormulario({
   tipo = "text",
   placeholder = "",
 }) {
+  const idCampo = `campo-${etiqueta
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, "-")}`;
+
   return (
     <div>
-      <label className="mb-1.5 block text-sm font-medium text-slate-700">
+      <label
+        htmlFor={idCampo}
+        className="mb-1.5 block text-sm font-medium text-slate-700"
+      >
         {etiqueta}
       </label>
+
       <input
+        id={idCampo}
         type={tipo}
         value={valor}
         onChange={(e) => cambiar(e.target.value)}
         placeholder={placeholder}
         min={tipo === "number" ? "1" : undefined}
+        step={tipo === "number" ? "1" : undefined}
         required
         className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm outline-none transition focus:border-[#16A34A]"
       />
@@ -775,7 +878,10 @@ function CampoFormulario({
 function DetalleDato({ etiqueta, valor }) {
   return (
     <div className="flex items-center justify-between gap-3 border-b border-slate-100 pb-3">
-      <span className="text-sm text-slate-500">{etiqueta}</span>
+      <span className="text-sm text-slate-500">
+        {etiqueta}
+      </span>
+
       <span className="text-right text-sm font-semibold text-slate-800">
         {valor}
       </span>
