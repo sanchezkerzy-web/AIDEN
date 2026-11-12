@@ -155,15 +155,7 @@ export default function DashboardSupervisor() {
          >
            <Activity size={15} />
            Ver Reportes
-         </button>
-         <button
-             type="button"
-              onClick={() => router.push("/")}
-             className="px-4 py-2 bg-emerald-600 hover:bg-emerald-800 text-white rounded-lg text-sm font-semibold flex items-center gap-2 transition-colors"
-            >
-             <House size={15} />
-             Volver al inicio
-            </button>
+         </button>      
 
          
        </section>
