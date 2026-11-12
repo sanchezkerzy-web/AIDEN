@@ -292,10 +292,10 @@ export default function ReportesPage() {
 
             <button
               type="button"
-              onClick={exportarPdf}
-              className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-100"
-            >
-              <Printer size={15} aria-hidden="true" />
+              onClick={() => window.print()}
+              className="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700 transition"
+             >
+              <Printer size={18}/>
               Imprimir / Guardar PDF
             </button>
           </header>
